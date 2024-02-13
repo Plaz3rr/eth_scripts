@@ -4,6 +4,10 @@ from termcolor import cprint
 from web3 import Web3
 import random
 
+#Выбери Network и RPC и поставь на вывод любую монету(строка 50) с банана с кошельков из wallets.txt
+#Вставь сюда(64 строка) свои API из аккаунта на банане и добавь в его настройках свой актуальный IP 
+
+
 def check_balance(address, number, web3):
     try:
         balance = web3.eth.get_balance(web3.toChecksumAddress(address))
@@ -57,8 +61,8 @@ if __name__ == "__main__":
     web3 = Web3(Web3.HTTPProvider(RPC))
 
     # api_keys of binance
-    API_KEY = ""
-    API_SECRET = ""
+    API_KEY = "ВСТАВЬ СВОЙ"
+    API_SECRET = "ВСТАВЬ СВОЙ"
 
     cprint('\a\n/// start check balance...', 'white')
     number = 0
