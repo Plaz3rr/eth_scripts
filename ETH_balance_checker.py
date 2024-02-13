@@ -5,6 +5,7 @@ from web3 import Web3
 import random
 from decimal import Decimal
 
+
 def get_eth_usdc_price():
     exchange = ccxt.binance()  # Используем биржу Binance для получения курса
     market = exchange.load_markets()
