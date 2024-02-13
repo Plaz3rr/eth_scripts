@@ -5,6 +5,7 @@ from web3 import Web3
 import random
 from decimal import Decimal
 
+#проверяем РПЦ и чекаем баланс кошельков из файла wallets.txt в ETH и его стоимость в USDC
 
 def get_eth_usdc_price():
     exchange = ccxt.binance()  # Используем биржу Binance для получения курса
