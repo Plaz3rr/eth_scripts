@@ -6,7 +6,7 @@ import time
 #Скрипт отправляет максимально возможное количество ETH с кошельков senders.txt на кошельки(напр. суббакаунты) receivers.txt
 #Выжидает нужный газ и отправляет, в случае ошибки через 60сек повторяет всё заново с кошелька на котором остановился
 
-# Подключение к Ethereum сети через Infura
+# Подключение к Ethereum сети
 infura_url = "https://eth.meowrpc.com"
 web3 = Web3(Web3.HTTPProvider(infura_url))
 assert web3.isConnected()
