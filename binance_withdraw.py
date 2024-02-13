@@ -57,8 +57,8 @@ if __name__ == "__main__":
     web3 = Web3(Web3.HTTPProvider(RPC))
 
     # api_keys of binance
-    API_KEY = "JvdVrMOnmTYBnB6zbazzYm00oSZpQH3n33nlmiimYoSosrDaBsaShKvoEmnXZcIB"
-    API_SECRET = "9sZp1dZVZl2WggLLsUsu6Ldsxq6G4tldUjUydp0gQEXZ8afykEzj6Q8BSeLVF79C"
+    API_KEY = ""
+    API_SECRET = ""
 
     cprint('\a\n/// start check balance...', 'white')
     number = 0
