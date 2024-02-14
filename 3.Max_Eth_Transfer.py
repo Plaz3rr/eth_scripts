@@ -1,7 +1,7 @@
 from web3 import Web3
 import time
 
-#Проверь ГАЗ! 22 строка
+#Проверь ГАЗ! 27 строка
 
 #Скрипт отправляет максимально возможное количество ETH с кошельков senders.txt на кошельки(напр. суббакаунты) receivers.txt
 #Выжидает нужный газ и отправляет, в случае ошибки через 60сек повторяет всё заново с кошелька на котором остановился
@@ -10,6 +10,11 @@ import time
 infura_url = "https://eth.meowrpc.com"
 web3 = Web3(Web3.HTTPProvider(infura_url))
 assert web3.isConnected()
+
+def read_receivers(receivers_file):
+    with open(receivers_file, 'r') as rcv_file:
+        receivers = [line.strip().lower() for line in rcv_file.readlines()]  # Приведение адресов к нижнему регистру
+    return receivers
 
 # Функция для считывания приватных ключей и адресов получателей
 def read_private_keys_and_receivers(private_keys_file, receivers_file):
@@ -20,6 +25,7 @@ def read_private_keys_and_receivers(private_keys_file, receivers_file):
     return private_keys, receivers
 
 def send_max_eth_if_gas_is_low(private_key, receiver, max_gas_price_gwei=31):
+    receiver = web3.toChecksumAddress(receiver)
     account = web3.eth.account.privateKeyToAccount(private_key)
 
     while True:
