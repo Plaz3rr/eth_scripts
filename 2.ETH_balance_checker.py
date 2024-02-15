@@ -34,8 +34,9 @@ if __name__ == "__main__":
     # RPC = 'https://polygon-rpc.com'
     # RPC = 'https://arb1.arbitrum.io/rpc'
     # RPC = 'https://rpc.ankr.com/eth'
-    RPC = 'https://1rpc.io/zksync2-era'
+    # RPC = 'https://1rpc.io/zksync2-era'
     # RPC = 'https://1rpc.io/linea'
+    RPC = 'https://base.llamarpc.com'
     
     web3 = Web3(Web3.HTTPProvider(RPC))
     
