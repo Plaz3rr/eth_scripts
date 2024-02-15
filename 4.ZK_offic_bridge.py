@@ -65,7 +65,7 @@ def automate_transactions(private_keys, contract):
 
 
         # Задержка между транзакциями
-        time.sleep(random.randint(3, 8))
+        time.sleep(random.randint(10, 16))
 
 # Запускаем функцию отправки транзакций
 automate_transactions(private_keys, contract)
