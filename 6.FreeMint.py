@@ -39,7 +39,6 @@ def read_last_successful_tx():
             return file.read()
     return None
 
-
 # Функция для сохранения последней успешной транзакции в файл
 def save_last_successful_tx(tx_info):
     with open(last_tx_file, 'w') as file:
@@ -47,7 +46,6 @@ def save_last_successful_tx(tx_info):
 
 #читаем информацию о последней успешной транзакции
 last_successful_tx = read_last_successful_tx()
-
 
 # Функция для автоматизации отправки транзакций
 def automate_transactions(private_keys, contract):
