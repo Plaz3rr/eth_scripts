@@ -1,22 +1,22 @@
 from web3 import Web3
 import json
-import random
 import sys
 import time
 import os
+import random
 
+#Установи ГАЗ!!!! 90 строка
 #Скрипт активирует функцию mint, контракта ZerionDna, фриминт в сети ETH.  
-#Отправляет транзы поочередно с рандомной заданной задержкой. Проверяет газ(73строка) каждые 10сек и отправляет когда падает до заданных пределов
+#Отправляет транзы поочередно с рандомной заданной задержкой. Проверяет газ каждые 10сек и отправляет когда падает до заданных пределов
 #для его работы создаем файлы mint.txt (для приватников), last_successful_tx6.txt (для записи посл.транзакции - чтобы после остановки скрипта всегда можно было увидеть посл.успешную транзу)
+
 
 # Информация для подключения к Ethereum через RPC и данные контракта
 eth_rpc_url = 'https://eth.meowrpc.com'
 contract_address = '0x932261f9Fc8DA46C4a22e31B45c4De60623848bF'
 private_keys_file_path = 'mint.txt'
-
-# Создаем соединение с Ethereum RPC
 web3 = Web3(Web3.HTTPProvider(eth_rpc_url))
-assert web3.isConnected()
+assert web3.isConnected(), "Не удалось подключиться к Ethereum RPC"
 
 # Чтение приватных ключей из файла
 private_keys = []
@@ -39,6 +39,7 @@ def read_last_successful_tx():
             return file.read()
     return None
 
+
 # Функция для сохранения последней успешной транзакции в файл
 def save_last_successful_tx(tx_info):
     with open(last_tx_file, 'w') as file:
@@ -47,52 +48,47 @@ def save_last_successful_tx(tx_info):
 #читаем информацию о последней успешной транзакции
 last_successful_tx = read_last_successful_tx()
 
-# Функция для автоматизации отправки транзакций
-def automate_transactions(private_keys, contract):
+# Функция ожидания нужной стоимости газа
+def wait_for_desired_gas_price(target_gas_price_gwei):
+    while True:
+        current_gas_price = web3.eth.gasPrice
+        if current_gas_price <= Web3.toWei(target_gas_price_gwei, 'gwei'):
+            return current_gas_price
+        else:
+            print(f"Текущая стоимость газа {Web3.fromWei(current_gas_price, 'gwei')} gwei выше цели {target_gas_price_gwei} gwei.")
+            time.sleep(10) # время сек до следующей проверки газа
+
+# Функция автоматизации отправки транзакций
+def automate_transactions(private_keys, contract, desired_gas_price_gwei):
     global last_successful_tx  # Используем глобальную переменную для хранения данных о последней успешной транзакции
 
     for private_key in private_keys:
         account = web3.eth.account.privateKeyToAccount(private_key)
         nonce = web3.eth.getTransactionCount(account.address, 'pending')
+        desired_gas_price = wait_for_desired_gas_price(desired_gas_price_gwei)
+        
+        tx = {
+            'chainId': web3.eth.chainId,
+            'gas': 115849,
+            'gasPrice': desired_gas_price,
+            'nonce': nonce,
+            'to': contract_address,
+            'value': 0,
+            'data': '0x1249c58b72db8c0b'  # вызов функции mint
+        }
+        
+        # Подпись и отправка транзакции
+        signed_tx = account.signTransaction(tx)
+        tx_hash = web3.eth.sendRawTransaction(signed_tx.rawTransaction)
+        print(f'\033[92m>>> Успешно | Адрес: {account.address} | Хеш: {tx_hash.hex()} | Стоимость газа: {Web3.fromWei(desired_gas_price, "gwei")} gwei\033[0m')
+        save_last_successful_tx(f'Адрес: {account.address} | Хеш: {tx_hash.hex()}')
+        
+        time.sleep(random.uniform(3, 5)) # Задержка 3-5 секунд перед следующей транзакцией
 
-       
-        try:
-            # Строим транзакцию
-            tx = {
-                'chainId': web3.eth.chainId,
-                'gas': 115849,  # Заданный лимит газа
-                'gasPrice': web3.eth.gasPrice,
-                'nonce': nonce,
-                'to': contract_address,
-                'value': 0,  # Нет отправки эфира
-                'data': '0x1249c58b72db8c0b'  # вызов функции mint
-            }
-
-            while True:
-                gas_price = web3.eth.gasPrice  # Получаем текущую стоимость газа
-                if gas_price <= Web3.toWei(15, 'gwei'):
-                    break
-                print(f"Текущая стоимость газа {Web3.fromWei(gas_price, 'gwei')} gwei, ожидание уменьшения.")
-                time.sleep(10)  # Подождите 10 секунд перед следующей проверкой
-
-            # Подпись и отправка транзакции
-            signed_tx = account.signTransaction(tx)
-            tx_hash = web3.eth.sendRawTransaction(signed_tx.rawTransaction)
-            last_successful_tx = f'>>> Успешно | Адрес: {account.address} | Хеш: {tx_hash.hex()}'
-            print('\033[92m' + last_successful_tx + '\033[0m')
-            save_last_successful_tx(last_successful_tx)
-
-            time.sleep(random.uniform(10, 20))
-
-        except KeyboardInterrupt:
-            if last_successful_tx:
-                print('\033[92m' + ">>>Скрипт остановлен. Последняя успешная транзакция:" + '\033[0m')
-                print('\033[92m' + last_successful_tx + '\033[0m')
-            else:
-                print('\033[92m' + ">>>Скрипт остановлен. Нет данных о последней успешной транзакции." + '\033[0m')
-            sys.exit()
-
-
-       
-# Запускаем функцию отправки транзакций
-automate_transactions(private_keys, contract)
+# Запуск функции
+try:
+    automate_transactions(private_keys, contract, 13)  # Целевая стоимость газа
+except KeyboardInterrupt:
+    print('\033[92m' + ">>>Скрипт остановлен пользователем." + '\033[0m')
+    if last_successful_tx:
+        print('\033[92m' + f"Последняя успешная транзакция: {last_successful_tx}" + '\033[0m')
