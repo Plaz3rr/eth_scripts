@@ -3,13 +3,17 @@ import time
 import os
 import sys
 
-#Проверь ГАЗ! 50 строка
+#Настройки:
+# 14 строка - RPC
+# 62 строка - gazlimit
+# 83 строка - chain ID
 
 #Скрипт отправляет максимально возможное количество ETH с кошельков senders.txt на кошельки(напр. суббакаунты) receivers.txt
 #Выжидает нужный газ и отправляет, в случае ошибки через 60сек повторяет всё заново с кошелька на котором остановился
 
-# Подключение к Ethereum сети
-infura_url = "https://eth.meowrpc.com"
+# !Подключение к нужной сети!
+infura_url = "https://endpoints.omniatech.io/v1/arbitrum/one/public"
+#infura_url = "https://eth.meowrpc.com"
 web3 = Web3(Web3.HTTPProvider(infura_url))
 assert web3.isConnected()
 
@@ -47,7 +51,7 @@ def read_private_keys_and_receivers(private_keys_file, receivers_file):
         receivers = [line.strip() for line in rcv_file.readlines()]
     return private_keys, receivers
 
-def send_max_eth_if_gas_is_low(private_key, receiver, max_gas_price_gwei=18):
+def send_max_eth_if_gas_is_low(private_key, receiver, max_gas_price_gwei=1):
     global last_successful_tx  # Используем глобальную переменную для хранения данных о последней успешной транзакции
     receiver = web3.toChecksumAddress(receiver)
     account = web3.eth.account.privateKeyToAccount(private_key)
@@ -55,7 +59,8 @@ def send_max_eth_if_gas_is_low(private_key, receiver, max_gas_price_gwei=18):
     while True:
         gas_price = web3.eth.gasPrice
         balance = web3.eth.getBalance(account.address)
-        gas_limit = 21000  # Стандартный лимит газа для транзакции ETH
+        # gas_limit = 21000  # Стандартный лимит газа для транзакции ETH
+        gas_limit = 920000   # в притык должно хватать для ARBITRUM
         gas_cost = gas_price * gas_limit
 
         # Проверяем, достаточно ли средств на балансе для покрытия стоимости газа
@@ -75,7 +80,8 @@ def send_max_eth_if_gas_is_low(private_key, receiver, max_gas_price_gwei=18):
 
         # Создаем и отправляем транзакцию
         tx = {
-            'chainId': 1,  # Для основной сети Ethereum
+            'chainId': 42161,  # Для ARB
+            #'chainId': 1, # Для ETH
             'nonce': web3.eth.getTransactionCount(account.address),
             'to': receiver,
             'value': amount_to_send,
