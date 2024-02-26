@@ -60,8 +60,8 @@ if __name__ == "__main__":
     RPC = 'https://1rpc.io/zksync2-era'
     web3 = Web3(Web3.HTTPProvider(RPC))
 
-    API_KEY = "JvdVrMOnmTYBnB6zbazzYm00oSZpQH3n33nlmiimYoSosrDaBsaShKvoEmnXZcIB"  # Вставьте ваш API Key
-    API_SECRET = "9sZp1dZVZl2WggLLsUsu6Ldsxq6G4tldUjUydp0gQEXZ8afykEzj6Q8BSeLVF79C"  # Вставьте ваш Secret Key
+    API_KEY = "....."  # Вставьте ваш API Key
+    API_SECRET = "....."  # Вставьте ваш Secret Key
 
     cprint('\a\n/// Начинаем проверку балансов...', 'white')
     number = 0
