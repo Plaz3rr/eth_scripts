@@ -57,11 +57,11 @@ if __name__ == "__main__":
     # RPC = 'https://polygon-rpc.com'
     # RPC = 'https://arb1.arbitrum.io/rpc'
     # RPC = 'https://rpc.ankr.com/eth'
-    RPC = 'https://1rpc.io/zksync2-era'
+    RPC = 'https://mainnet.era.zksync.io'
     web3 = Web3(Web3.HTTPProvider(RPC))
 
-    API_KEY = "JvdVrMOnmTYBnB6zbazzYm00oSZpQH3n33nlmiimYoSosrDaBsaShKvoEmnXZcIB"  # Вставьте ваш API Key
-    API_SECRET = "9sZp1dZVZl2WggLLsUsu6Ldsxq6G4tldUjUydp0gQEXZ8afykEzj6Q8BSeLVF79C"  # Вставьте ваш Secret Key
+    API_KEY = "...."  # Вставьте ваш API Key
+    API_SECRET = "...."  # Вставьте ваш Secret Key
 
     cprint('\a\n/// Начинаем проверку балансов...', 'white')
     number = 0
@@ -70,17 +70,21 @@ if __name__ == "__main__":
         number += 1
         check_balance(address, number, web3)  # Проверяем баланс ETH
 
+    
     cprint('\a\n/// Начинаем вывод...', 'white')
     desired_min_balance_eth = 0.0114  # Минимальный желаемый баланс в ETH
     desired_max_balance_eth = 0.0118  # Максимальный желаемый баланс в ETH
     binance_withdrawal_fee = Decimal('0.00015')
+    number = 1
     for wallet in wallets_list:
         address = web3.toChecksumAddress(wallet)
         current_balance = web3.eth.get_balance(address)
         current_balance_eth = Decimal(web3.fromWei(current_balance, 'ether'))
     
+        
         if current_balance_eth < desired_min_balance_eth:
            # Если текущий баланс меньше минимального желаемого баланса
+           
            desired_balance_eth = Decimal(random.uniform(desired_min_balance_eth, desired_max_balance_eth))
         # Рассчитываем необходимую сумму для "вывода" (пополнения)
            amount_to_add = (desired_balance_eth + binance_withdrawal_fee) - current_balance_eth
@@ -88,9 +92,10 @@ if __name__ == "__main__":
         # Вызываем функцию для "вывода" средств
            binance_withdraw(number, address, float(amount_to_add), symbolWithdraw, network, API_KEY, API_SECRET)
            cprint(f"Пополняем {address} на {amount_to_add} ETH для достижения желаемого баланса.", "green")
+           number += 1
         else:
            cprint(f"Пропуск {address}. Текущий баланс уже соответствует желаемому.", "yellow")
-        number += 1
+        
 
         
         time.sleep(random.randint(12, 30))
