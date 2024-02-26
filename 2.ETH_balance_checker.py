@@ -20,9 +20,11 @@ def check_balance(address, number, web3, eth_usdc_price):
         humanReadable_decimal = Decimal(str(humanReadable))  # Преобразование в Decimal
         usd_balance = humanReadable_decimal * Decimal(eth_usdc_price)  # Умножение Decimal на Decimal
         cprint(f'{number}. {address} : {humanReadable} ETH / {usd_balance:.2f} USDC', 'white')
+        return humanReadable_decimal
 
     except Exception as error:
         cprint(f'{number}. {address} = {error}', 'red')
+        return Decimal(0)
 
 if __name__ == "__main__":
     
@@ -34,12 +36,13 @@ if __name__ == "__main__":
     # RPC = 'https://polygon-rpc.com'
     # RPC = 'https://arb1.arbitrum.io/rpc'
     # RPC = 'https://rpc.ankr.com/eth'
-    # RPC = 'https://1rpc.io/zksync2-era'
+    RPC = 'https://1rpc.io/zksync2-era'
     # RPC = 'https://1rpc.io/linea'
-    RPC = 'https://base.llamarpc.com'
+    # RPC = 'https://base.llamarpc.com'
+    # RPC = 'https://1rpc.io/scroll'
     
     web3 = Web3(Web3.HTTPProvider(RPC))
-    
+    total_eth_balance = Decimal(0)
     eth_usdc_price = get_eth_usdc_price()  # Получаем текущий курс ETH/USDC
 
     cprint('\a\n/// start check balance...', 'white')
@@ -47,7 +50,9 @@ if __name__ == "__main__":
     for wallet in wallets_list:
         address = web3.toChecksumAddress(wallet)
         number = number + 1
-        check_balance(address, number, web3, eth_usdc_price)  # Проверяем баланс ETH и показываем его в USDC
+        balance = check_balance(address, number, web3, eth_usdc_price)  # Проверяем баланс и получаем его в ETH
+        total_eth_balance += balance
+        
 
-    cprint('\a\n/// done.', 'white')
+    cprint(f'\a\n/// Проверка завершена. Итоговый баланс всех кошельков: {total_eth_balance} ETH', 'green')
 
