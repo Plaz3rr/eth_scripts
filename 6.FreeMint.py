@@ -47,7 +47,7 @@ def save_last_successful_tx(tx_info):
     with open(last_tx_file, 'w') as file:
         file.write(tx_info)
 
-#читаем информацию о последней успешной транзакции
+# читаем информацию о последней успешной транзакции
 last_successful_tx = read_last_successful_tx()
 
 # Функция отправки транзакций
@@ -56,7 +56,7 @@ def send_transactions(private_keys, contract, target_gas_price_gwei):
         account = web3.eth.account.privateKeyToAccount(private_key)
         nonce = web3.eth.getTransactionCount(account.address)
         
-        # Ожидание подходящей стоимости газа(задаём 89стр)
+        # Ожидание подходящей стоимости GWEI(задаём 89стр)
         while True:
             current_gas_price = web3.eth.gasPrice
             if current_gas_price <= web3.toWei(target_gas_price_gwei, 'gwei'):
