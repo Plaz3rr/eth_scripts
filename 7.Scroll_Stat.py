@@ -26,7 +26,7 @@ contract_abi = json.loads('[{"inputs":[{"internalType":"string","name":"_name","
 # Инициализация контракта для нфт чекера
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
-ETHERSCAN_API_KEY = 'GFVXJXT6TISEZ71ESTS36V8N3ZY9FQYMFG'
+ETHERSCAN_API_KEY = 'вставь свой'
 ETHERSCAN_API_URL = 'https://api.scrollscan.com/api'
 
 def get_transaction_history(wallet_address):
