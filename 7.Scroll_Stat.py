@@ -9,7 +9,7 @@ import requests
 from datetime import datetime
 from collections import Counter
 
-#119 строка настрой нужную функцию для отображения инфы по кошелькам из wallets.txt  
+#119 строка настрой нужную функцию для вывода инфы по кошелькам из wallets.txt  
 
 
 # RPC и контракт Скролл оригин НФТ
