@@ -4,7 +4,7 @@ from termcolor import cprint
 from web3 import Web3
 import random
 from decimal import Decimal, ROUND_DOWN
-
+#64-65 API Binance
 #скрипт выводит эфир с банана на кошельки из wallets.txt пополняя их на такую сумму, чтобы итоговый баланс кошельков был в пределах заданной суммы стр 76
 #Проверь РПЦ!!! 51 и ниже
 #29 строка - мин. сумма вывода на банане, стр 78 - сумма комиссии банана
