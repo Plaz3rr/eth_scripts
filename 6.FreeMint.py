@@ -1,13 +1,15 @@
 from web3 import Web3
+from datetime import datetime, timedelta
 import json
 import sys
 import time
 import os
 import random
 
-#Установи ГАЗ!!!! 89 строка
+#Установи ГАЗ!!!! 96 строка
+#Задержка между транзакциями 93 строка
 #Скрипт активирует функцию mint, контракта ZerionDna, фриминт в сети ETH.  
-#Отправляет транзы(Type-2) поочередно с рандомно заданной задержкой. Проверяет газ каждые 10 сек и отправляет когда падает до заданных пределов
+#Отправляет транзы(Type-2) поочередно с рандомной заданной задержкой. Проверяет газ каждые 25сек и отправляет когда падает до заданных пределов
 #для его работы создаем файлы mint.txt (для приватников), last_successful_tx6.txt (для записи посл.транзакции - чтобы после остановки скрипта всегда можно было увидеть посл.успешную транзу)
 
 
@@ -47,22 +49,23 @@ def save_last_successful_tx(tx_info):
     with open(last_tx_file, 'w') as file:
         file.write(tx_info)
 
-# читаем информацию о последней успешной транзакции
+#читаем информацию о последней успешной транзакции
 last_successful_tx = read_last_successful_tx()
 
 # Функция отправки транзакций
 def send_transactions(private_keys, contract, target_gas_price_gwei):
+    transaction_counter = 1
     for private_key in private_keys:
         account = web3.eth.account.privateKeyToAccount(private_key)
         nonce = web3.eth.getTransactionCount(account.address)
         
-        # Ожидание подходящей стоимости GWEI(задаём 89стр)
+        # Ожидание подходящей стоимости газа(задаём 89стр)
         while True:
             current_gas_price = web3.eth.gasPrice
             if current_gas_price <= web3.toWei(target_gas_price_gwei, 'gwei'):
                 break
-            print(f"Текущая стоимость газа {Web3.fromWei(current_gas_price, 'gwei')} gwei выше цели {target_gas_price_gwei} gwei.")
-            time.sleep(10)
+            print(f"Стоимость газа {Web3.fromWei(current_gas_price, 'gwei')} gwei, ожидаем уменьшения до {target_gas_price_gwei} gwei.")
+            time.sleep(25)
         
         tx = {
             'type': '0x2',
@@ -79,14 +82,18 @@ def send_transactions(private_keys, contract, target_gas_price_gwei):
         signed_tx = account.sign_transaction(tx)
         tx_hash = web3.eth.sendRawTransaction(signed_tx.rawTransaction)
         
+         # Получить текущее время +3 часа для GMT+3
+        local_time = datetime.utcnow() + timedelta(hours=3)
+        formatted_time = local_time.strftime("%Y-%m-%d %H:%M:%S")
         
-        print(f'\033[92m>>> Успешно | Адрес: {account.address} | Хеш: {tx_hash.hex()} | Газ: {Web3.fromWei(tx["maxFeePerGas"], "gwei")} gwei\033[0m')
+        
+        print(f'\033[92m>>> Успешно {local_time_str} |{transaction_counter}| Адрес: {account.address} | Хеш: {tx_hash.hex()} | Газ: {Web3.fromWei(tx["maxFeePerGas"], "gwei")} gwei\033[0m')
         save_last_successful_tx(f'Адрес: {account.address} | Хеш: {tx_hash.hex()}')
         
-        time.sleep(random.randint(3, 5))
+        time.sleep(random.randint(420, 520))
 
 try:
-    send_transactions(private_keys, contract, 13)
+    send_transactions(private_keys, contract, 16)
 except KeyboardInterrupt:
     print('\033[92m>>>Скрипт остановлен пользователем.\033[0m')
     with open('last_successful_tx6.txt', 'r') as file:
